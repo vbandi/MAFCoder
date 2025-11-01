@@ -11,7 +11,7 @@ Console.OutputEncoding = System.Text.Encoding.UTF8;
 AnsiConsole.Background = Color.Black;
 AnsiConsole.Clear();
 AnsiConsole.Write(new FigletText("MAFCoder.CLI").Color(Color.Blue).Centered());
-AnsiConsole.Write(new Markup("[blue]a CLI coding agent you can actually understand[/] ([green]built on .NET[/])\n\n\n").Centered());
+AnsiConsole.Write(new Markup("[blue]a CLI coding agent you can actually understand[/] - [green]built on .NET[/]\n\n\n").Centered());
 
 var key = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
 
