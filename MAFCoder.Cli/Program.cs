@@ -10,7 +10,7 @@ Console.OutputEncoding = System.Text.Encoding.UTF8;
 
 AnsiConsole.Background = Color.Black;
 AnsiConsole.Clear();
-AnsiConsole.Write(new FigletText("MAFCoder").Centered());
+AnsiConsole.Write(new FigletText("MAFCoder.CLI").Centered());
 
 var key = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
 

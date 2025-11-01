@@ -9,8 +9,6 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.0.0-preview.251028.1" />
-      <PackageReference Include="OpenTelemetry" Version="1.14.0-rc.1" />
-      <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.14.0-rc.1" />
       <PackageReference Include="Spectre.Console" Version="0.53.1-preview.0.2" />
     </ItemGroup>
 
