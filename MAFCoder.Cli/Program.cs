@@ -100,10 +100,10 @@ async ValueTask<object?> CustomFunctionCallingMiddleware(
     Func<FunctionInvocationContext, CancellationToken, ValueTask<object?>> next,
     CancellationToken cancellationToken)
 {
-    AnsiConsole.MarkupLineInterpolated($"\n\n[yellow]Function Call: {context.Function.Name}({string.Join(',', context.Arguments.Select(a => $"{a.Key}: {a.Value}"))})[/]");
+    AnsiConsole.Foreground = Color.Yellow;
+    AnsiConsole.WriteLine($"Function Call: {context.Function.Name}({string.Join(',', context.Arguments.Select(a => $"{a.Key}: {a.Value}"))})");
     var result = await next(context, cancellationToken);
-    AnsiConsole.MarkupLine($"[yellow]Function Call Result: {result}[/]");
-
+    AnsiConsole.WriteLine($"Function Call Result: {result}");
     return result;
 }
 
