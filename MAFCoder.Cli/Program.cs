@@ -13,6 +13,7 @@ AnsiConsole.Clear();
 AnsiConsole.Write(new FigletText("MAFCoder.CLI").Color(Color.Blue).Centered());
 AnsiConsole.Write(new Markup("[blue]a CLI coding agent you can actually understand[/] - [green]built on .NET[/]\n\n\n").Centered());
 
+const string model = "gpt-4o";
 var key = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
 
 if (key == null)
@@ -41,7 +42,7 @@ else
 var calculator = new Calculator();
 var fileOperators = new FileOperators(workingDirectory);
 
-AIAgent agent = new OpenAIClient(key).GetOpenAIResponseClient("gpt-4o-mini").CreateAIAgent(
+AIAgent agent = new OpenAIClient(key).GetOpenAIResponseClient(model).CreateAIAgent(
     "You are an annoyingly friendly AI Assistant. Explain what you are doing.",
     tools:
     [
