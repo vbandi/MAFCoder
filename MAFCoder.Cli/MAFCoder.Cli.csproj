@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -11,6 +11,7 @@
       <PackageReference Include="Microsoft.Agents.AI.OpenAI" Version="1.0.0-preview.251028.1" />
       <PackageReference Include="OpenAI" Version="2.6.0" />
       <PackageReference Include="Spectre.Console" Version="0.53.1-preview.0.2" />
+      <PackageReference Include="ConsoleInk.Net" Version="0.1.4" />
     </ItemGroup>
 
 </Project>

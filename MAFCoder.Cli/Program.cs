@@ -1,8 +1,9 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using OpenAI;
 using Spectre.Console;
+using ConsoleInk; // Added for Markdown rendering
 
 #pragma warning disable OPENAI001
 
@@ -13,7 +14,7 @@ AnsiConsole.Clear();
 AnsiConsole.Write(new FigletText("MAFCoder.CLI").Color(Color.Blue).Centered());
 AnsiConsole.Write(new Markup("[blue]a CLI coding agent you can actually understand[/] - [green]built on .NET[/]\n\n\n").Centered());
 
-const string model = "gpt-4o";
+const string model = "gpt-5";
 var key = Environment.GetEnvironmentVariable("OPENAI_API_KEY");
 
 if (key == null)
@@ -76,6 +77,7 @@ while (true)
             "What files are in the current directory? Just give a summary.",
             "Use command line to get the date",
             "Create a new Hello World .net app here, using the InvokeCommandLine tool.",
+            "Your source code is in a folder called 'MAFCoder.Cli'. Read through it to familiarize yourself with... yourself.",
         };
         
         userInput = AnsiConsole.Prompt(
@@ -86,11 +88,27 @@ while (true)
         AnsiConsole.Markup($"[yellow]{userInput}\n\n[/]");
     }
 
+    // We'll render the AI output as proper Markdown using ConsoleInk.
+    // To avoid Spectre markup conflicts, we write directly to Console.Out via MarkdownConsoleWriter.
+    using var mdWriter = new MarkdownConsoleWriter(Console.Out, new MarkdownRenderOptions
+    {
+        ConsoleWidth = Console.BufferWidth > 0 ? Console.BufferWidth : 80,
+        UseHyperlinks = true,
+        // You can tweak theme/colors here if desired
+    });
+
+    // Set the foreground color for prompts; actual AI output will be handled by ConsoleInk.
     AnsiConsole.Foreground = Color.White;
-    
+
     await foreach (var update in agent.RunStreamingAsync(userInput, thread))
     {
-        Console.Write(update.Text);   // using Console to avoid AnsiConsole interpreting special characters and throwing errors
+        var text = update.Text;
+        if (!string.IsNullOrEmpty(text))
+        {
+            // Stream chunks through the Markdown renderer so partial code blocks still display nicely.
+            mdWriter.Write(text);
+            mdWriter.Flush();
+        }
     }
 }
 
@@ -100,11 +118,19 @@ async ValueTask<object?> CustomFunctionCallingMiddleware(
     Func<FunctionInvocationContext, CancellationToken, ValueTask<object?>> next,
     CancellationToken cancellationToken)
 {
-    AnsiConsole.Foreground = Color.Yellow;
-    AnsiConsole.WriteLine($"Function Call: {context.Function.Name}({string.Join(',', context.Arguments.Select(a => $"{a.Key}: {a.Value}"))})");
-    var result = await next(context, cancellationToken);
-    AnsiConsole.WriteLine($"Function Call Result: {result}");
-    return result;
+    // Write function-call diagnostics to stderr so they don't mangle Markdown on stdout
+    try
+    {
+        Console.Error.WriteLine($"[Function Call] {context.Function.Name}({string.Join(',', context.Arguments.Select(a => $"{a.Key}: {a.Value}"))})");
+        var result = await next(context, cancellationToken);
+        Console.Error.WriteLine($"[Function Result] {result}");
+        return result;
+    }
+    catch (Exception ex)
+    {
+        Console.Error.WriteLine($"[Function Error] {ex.Message}");
+        throw;
+    }
 }
 
 public class Calculator
