@@ -20,8 +20,25 @@ if (key == null)
     return;
 }
 
+var workingDirectory = Directory.GetCurrentDirectory();
+
+if (args.Length == 0)
+{
+    AnsiConsole.WriteLine($"No arguments provided. Defaulting to current directory. '{workingDirectory}'");
+}
+else
+{
+    workingDirectory = args[0];
+    if (!Directory.Exists(workingDirectory))
+    {
+        AnsiConsole.WriteLine($"Provided directory '{workingDirectory}' does not exist. Exiting...");
+        return;
+    }
+    AnsiConsole.WriteLine($"Using provided working directory: '{workingDirectory}'");
+}
+
 var calculator = new Calculator();
-var fileOperators = new FileOperators(Directory.GetCurrentDirectory());
+var fileOperators = new FileOperators(workingDirectory);
 
 AIAgent agent = new OpenAIClient(key).GetOpenAIResponseClient("gpt-4o-mini").CreateAIAgent(
     "You are an annoyingly friendly AI Assistant. Explain what you are doing.",
@@ -56,6 +73,7 @@ while (true)
             "Add 2 random numbers",
             "What files are in the current directory? Just give a summary.",
             "Use command line to get the date",
+            "Create a new Hello World .net app here, using the InvokeCommandLine tool.",
         };
         
         userInput = AnsiConsole.Prompt(
@@ -70,7 +88,7 @@ while (true)
     
     await foreach (var update in agent.RunStreamingAsync(userInput, thread))
     {
-        AnsiConsole.Write(update.Text);
+        Console.Write(update.Text);   // using Console to avoid AnsiConsole interpreting special characters and throwing errors
     }
 }
 
@@ -135,6 +153,7 @@ public class FileOperators(string rootPath)
             RedirectStandardInput = true,
             UseShellExecute = false,
             CreateNoWindow = true,
+            WorkingDirectory = rootPath
         });
 
         if (process == null)
